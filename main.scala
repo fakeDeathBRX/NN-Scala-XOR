@@ -1,5 +1,6 @@
 object main{
   def main(args: Array[String]) = {
+    // XOR Variables
     var train = Array.ofDim[Double](4,2)
     var target = Array.ofDim[Double](4,1)
     train(0)(0) = 0.0;train(0)(1) = 1.0; target(0)(0) = 1.0
@@ -10,16 +11,15 @@ object main{
     var nn = new NeuralNetwork(2,4,1)
     nn.init()
 
-    for(i: Int <- 0 until 1000){
+    for(i: Int <- 0 until 2000){
       for(t: Int <- 0 until 4){
         nn.insertInput(train(t))
         nn.feedForward()
         nn.train(target(t))
-        //nn.printOutput()
       }
     }
     nn.input(0) = 1.0
-    nn.input(1) = 1.0
+    nn.input(1) = 0.0
     nn.feedForward()
     nn.printOutput()
   }
@@ -115,7 +115,7 @@ class NeuralNetwork(inputNodes: Int, hiddenNodes: Int, outputNodes: Int){
         InNode(i)(j) += IN_Grad(i)(j) * Learning_Rate
       // Biases:
       for(i: Int <- 0 until nodes)
-        NodeBias(i) += NB_Grad(i)*Learning_Rate
+        NodeBias(i) += NB_Grad(i) * Learning_Rate
     // Hidden - Output
       // Weights:
       for(i: Int <- 0 until nodes; j: Int <- 0 until outs)
@@ -126,6 +126,7 @@ class NeuralNetwork(inputNodes: Int, hiddenNodes: Int, outputNodes: Int){
   }
 
   def printOutput(): Unit ={
+    out = stepFunction(out)
     println()
     println("[Outputs]:")
     for(o: Double <- out)
@@ -133,19 +134,11 @@ class NeuralNetwork(inputNodes: Int, hiddenNodes: Int, outputNodes: Int){
   }
 
   def activate(arr: Array[Double]) ={
-    //arr.map(x => math.tanh(x)) // Hyper-Tan, for logic gates (like XOR) it's preferable to use Step Function
-    arr.map{x => if(x > 0.5) 1.0 else 0.0}
+    arr.map(x => math.tanh(x)) // Hyper-Tan
   }
 
-  def softmax(arr: Array[Double]): Unit = {
-    var sum: Double = 0.0
-    @scala.annotation.tailrec
-    def go(a: Array[Double]): Unit ={
-      sum += a.head
-      if(a.tail.isEmpty == false) go(a.tail)
-    }
-    var res = arr.clone()
-    res.map(x => math.exp(x)/sum)
+  def stepFunction(arr: Array[Double]) = {
+    arr.map{x => if(x > 0.5) 1.0 else 0.0}
   }
 
 }
