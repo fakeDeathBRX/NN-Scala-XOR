@@ -27,19 +27,24 @@ object main{
 }
 
 class NeuralNetwork(inputNodes: Int, hiddenNodes: Int, outputNodes: Int){
+  // Class related
   val ins: Int = inputNodes
   val nodes: Int = hiddenNodes
   val outs: Int = outputNodes
+
   // Neuron values
-  var input: Array[Double] = new Array[Double](inputNodes)
+  var input: Array[Double] = new Array[Double](ins)
   var node: Array[Double] = new Array[Double](nodes)
   var out: Array[Double] = new Array[Double](outs)
+
   // Weights
   var InNode = Array.ofDim[Double](ins,nodes)
   var NodeOut = Array.ofDim[Double](nodes,outs)
+
   // Biases
   var NodeBias = new Array[Double](nodes)
   var OutBias = new Array[Double](outs)
+
   // Settings
   var Learning_Rate = 0.05
 
@@ -53,30 +58,32 @@ class NeuralNetwork(inputNodes: Int, hiddenNodes: Int, outputNodes: Int){
   }
 
   def insertInput(inputs: Array[Double]): Unit = {
-    for(i: Int <- 0 until inputNodes) {
+    for(i: Int <- 0 until nodes)
       input(i) = inputs(i)
-    }
   }
 
   def feedForward(): Unit ={
     node = node.map(x => 0.0)
     out = out.map(x => 0.0)
+
     for(i: Int <- 0 until ins; j: Int <- 0 until nodes)
       node(j) += input(i) * InNode(i)(j) + NodeBias(j)
     node = activate(node)
+
     for(i: Int <- 0 until nodes; j: Int <- 0 until outs)
       out(j) += node(i) * NodeOut(i)(j) + OutBias(j)
     out = activate(out)
   }
 
   def train(target: Array[Double]): Unit ={
-    var IN_Grad = Array.ofDim[Double](ins,nodes)
-    var NO_Grad = Array.ofDim[Double](nodes,outs)
-    var NB_Grad = new Array[Double](nodes)
-    var OB_Grad = new Array[Double](outs)
+    // Gradients
+    var IN_Grad = Array.ofDim[Double](ins,nodes) // Input-Hidden
+    var NO_Grad = Array.ofDim[Double](nodes,outs) // Hidden-Output
+    var NB_Grad = new Array[Double](nodes) // Hidden Bias
+    var OB_Grad = new Array[Double](outs) // Output Bias
 
-    var Out_Signal = new Array[Double](outs)
-    var Node_Signal = new Array[Double](nodes)
+    var Out_Signal = new Array[Double](outs) // Output signal
+    var Node_Signal = new Array[Double](nodes) // Hidden signal
 
     var derivative: Double = 0.0
     var errorSignal: Double = 0.0
@@ -116,6 +123,7 @@ class NeuralNetwork(inputNodes: Int, hiddenNodes: Int, outputNodes: Int){
       // Biases:
       for(i: Int <- 0 until nodes)
         NodeBias(i) += NB_Grad(i) * Learning_Rate
+
     // Hidden - Output
       // Weights:
       for(i: Int <- 0 until nodes; j: Int <- 0 until outs)
@@ -129,8 +137,11 @@ class NeuralNetwork(inputNodes: Int, hiddenNodes: Int, outputNodes: Int){
     out = stepFunction(out)
     println()
     println("[Outputs]:")
-    for(o: Double <- out)
-      print(" "+o)
+    if(out.length == 1) print(out(0))
+    else {
+      for (o: Double <- out)
+        print(" " + o)
+    }
   }
 
   def activate(arr: Array[Double]) ={
