@@ -1,35 +1,37 @@
 object main{
     def main(args: Array[String]) = {
-        var nn = new NeuralNetwork(3,30,1)
-        val epoch = 5000*2 // 5000 is good, but sometimes it requires a little more
+        var nn = new NeuralNetwork(2,30,1)
+        val epoch = 5000 // 5000 is good, but sometimes it requires a little more
         val samples = epoch*0.01
         var error = 0.0
         nn.init()
-        for(i: Int <- 0 until epoch){
+        for(i: Int <- 1 until epoch*5000){
             val r = new scala.util.Random
             var angle: Double = r.nextDouble()
-            var train = Array.ofDim[Double](3)
+            var train = Array.ofDim[Double](2)
             var target = Array.ofDim[Double](1)
             train(0) = math.sin(angle)
             train(1) = math.cos(angle)
-            train(2) = math.tan(angle)
+            //train(2) = math.tan(angle)
             target(0) = angle
             nn.insertInput(train)
             error += nn.train(target)
             if(i%samples == 0){
                 error /= samples
-                print(s"Error: $error\r")
+                print(s"LR: ${nn.Learning_Rate} Error: $error\r")
                 error = 0.0
             }
+            if(i%(epoch*1000) == 0)
+                nn.Learning_Rate /= 2
         }
         println()
         val r = new scala.util.Random
         var angle: Double = r.nextDouble()
-        var test = Array.ofDim[Double](3)
+        var test = Array.ofDim[Double](2)
         var tar: Double = angle
         test(0) = math.sin(angle)
         test(1) = math.cos(angle)
-        test(2) = math.tan(angle)
+        //test(2) = math.tan(angle)
         nn.insertInput(test)
         nn.feedForward()
         nn.printOutput()
@@ -58,7 +60,7 @@ class NeuralNetwork(inputNodes: Int, hiddenNodes: Int, outputNodes: Int){
     var OutBias = new Array[Double](outs)
 
     // Settings
-    var Learning_Rate = 0.01
+    var Learning_Rate = 0.001
 
     def init(): Unit = {
         val r = new scala.util.Random
