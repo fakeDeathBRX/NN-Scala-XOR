@@ -1,11 +1,13 @@
 object main{
     def main(args: Array[String]) = {
-        var nn = new NeuralNetwork(2,30,1)
-        val epoch = 5000 // 5000 is good, but sometimes it requires a little more
-        val samples = epoch*0.01
-        var error = 0.0
+        var nn = new NeuralNetwork(2,50,1)
+        nn.Learning_Rate = 0.05
+        val epoch: Int = 20000 
+        val samples: Int = (epoch*0.01).asInstanceOf[Int]
+        val decrease: Int = (epoch/3).asInstanceOf[Int]
+        var error: Double = 0.0
         nn.init()
-        for(i: Int <- 1 until epoch*5000){
+        for(i: Int <- 1 until epoch){
             val r = new scala.util.Random
             var angle: Double = r.nextDouble()
             var train = Array.ofDim[Double](2)
@@ -21,7 +23,7 @@ object main{
                 print(s"LR: ${nn.Learning_Rate} Error: $error\r")
                 error = 0.0
             }
-            if(i%(epoch*1000) == 0)
+            if(i%decrease == 0)
                 nn.Learning_Rate /= 2
         }
         println()
