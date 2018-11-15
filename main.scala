@@ -1,6 +1,6 @@
 object main{
     def main(args: Array[String]) = {
-        var nn = new NeuralNetwork(2,50,1)
+        val nn = new NeuralNetwork(2,50,1)
         nn.Learning_Rate = 0.05
         val epoch: Int = 20000 
         val samples: Int = (epoch*0.01).asInstanceOf[Int]
